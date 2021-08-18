@@ -1,5 +1,3 @@
-const assets = JSON.parse(stringifiedAssets)
-
 const blockDefinitions = {}
 Object.keys(assets.blockstates).forEach(id => {
   blockDefinitions['minecraft:' + id] = deepslate.BlockDefinition.fromJson(id, assets.blockstates[id])
@@ -27,9 +25,9 @@ function loaded() {
 	const atlasData = atlasCtx.getImageData(0, 0, atlasCanvas.width, atlasCanvas.height)
 	const part = 16 / atlasData.width
 	const idMap = {}
-	Object.keys(assets.textures).forEach(t => {
-		const [u, v] = assets.textures[t]
-		idMap['minecraft:' + t] = [u, v, u + part, v + part]
+	Object.keys(assets.textures).forEach(id => {
+		const [u, v] = assets.textures[id]
+		idMap['minecraft:' + id] = [u, v, u + part, v + part]
 	})
 	const textureAtlas = new deepslate.TextureAtlas(atlasData, idMap)
 
@@ -48,7 +46,7 @@ function loaded() {
 		},
 		getBlockFlags(id) {
 			return {
-				opaque: false
+				opaque: opaqueBlocks.has(id)
 			}
 		},
 		getBlockProperties(id) {
@@ -59,8 +57,9 @@ function loaded() {
 		}
 	}
 	
-	const structure = new deepslate.Structure([2, 3, 2])
+	const structure = new deepslate.Structure([3, 2, 2])
 	structure.addBlock([1, 0, 1], "minecraft:stone")
+	structure.addBlock([2, 0, 1], "minecraft:grass_block", { "snowy": "false" })
 	structure.addBlock([1, 1, 1], "minecraft:cake", { "bites": "3" })
 	structure.addBlock([0, 0, 1], "minecraft:wall_torch", { "facing": "west" })
 	
@@ -72,8 +71,9 @@ function loaded() {
 	const { mat4 } = glMatrix
 	
 	const view = mat4.create()
-	mat4.rotateY(view, view, 0.2)
-	mat4.translate(view, view, [-0.5, -1, -5])
+	mat4.rotateX(view, view, 0.4)
+	mat4.rotateY(view, view, 0.3)
+	mat4.translate(view, view, [-0.5, -2, -5])
 	
 	renderer.drawStructure(view)	
 }
